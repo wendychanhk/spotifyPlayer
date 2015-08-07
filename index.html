@@ -1,0 +1,187 @@
+<html>
+<head>
+	<title> Sportify Player </title>
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<h1> Spotify Player </h1>
+
+	<label> What song do you like? </label><input type="text" class="word" value="sugar" />
+	<button class="submit" type="submit">SUBMIT</button>
+
+	<div class="widget">
+		<div class="header">
+
+			<div class="btn-play">
+			</div>
+
+			<div class="metadata">
+				<p class="title">Hunger of The Pine</p>
+				
+
+				<button class="author" type="button" data-toggle="modal" data-target="#myModal">alt-J</button>
+
+
+				<div id="seekbar">
+					<progress value="10" max="30"></progress>
+				</div>
+			</div>
+		</div>
+		<div class="cover">
+			<img src="https://i.scdn.co/image/04da6dfc1f5f45fdeba938a0cc71cf372524fd43">
+		</div>
+
+		<audio src="" id="js-player"></audio>
+
+	</div>
+
+
+
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
+
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel">Artist's Information</h4>
+				</div>
+				<div class="modal-body">
+					<ul id='list2'>
+						<ul id="image2"> 
+
+							<div class="name_modal">Name: </div>  
+							<div class="genres_modal">Geners: </div>
+							<div class="followers_modal">Followers: </div>
+							<div class="image_modal" ><img src=""></div>
+
+						</ul>
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+
+		function requestSong (event) {
+			event.preventDefault();
+			var requiredSong = $('.word').val();
+			var request = $.get('https://api.spotify.com/v1/search?q=' + requiredSong + '&type=track');
+			request.done(displaySong);  /*  the JSON file is passed to displayArtist (through var request */
+		};
+
+		$('.submit').on('click', requestSong)
+
+
+
+
+		function displaySong(request){
+
+			var item = request["tracks"]["items"][0]; 
+
+			$('.title').html(item['name']);
+			$('.author').html(item['artists'][0]['name']); 
+			$('.cover').html('<img src="'+ item["album"]["images"][0]["url"] + '">'); 
+			$('#js-player').attr("src", item["preview_url"]); 
+
+			var id = item['artists'][0]['id']; 
+			var request2 = $.get('https://api.spotify.com/v1/artists/' + id);
+			request2.done(displayArtist);  
+
+		};
+
+
+
+
+		function displayArtist(request2){
+
+			var name = request2["name"]
+			var genres = request2["genres"]
+			var followers = request2["followers"]["total"]
+			var url =  request2["images"][0]["url"] 
+
+
+
+			$('.name_modal').html('Name: ' + name);
+			$('.genres_modal').html('Genres: ' + genres);
+			$('.followers_modal').html('Followers: ' + followers);
+			$('.image_modal').html('<img src="'+ url +'" height="500" width="420">'); 
+
+
+		}; 
+
+
+
+
+
+		function playSong(){
+
+			$('#js-player').trigger('play'); 	
+			$('.btn-play').addClass('playing');
+			$('.btn-play').on('click', pauseSong);
+		}; 
+
+
+		$('.btn-play').on('click', playSong);
+
+
+		function pauseSong(){
+
+			$('#js-player').trigger('pause'); 
+			$('.btn-play').removeClass('playing');
+			$('.btn-play').on('click', playSong);
+
+		};
+
+
+
+
+		function printTime() {
+			var current = $('#js-player').prop('currentTime');
+			console.log('Current time: ' + current);
+			$('progress').attr("value", current);
+		}
+
+		$('#js-player').on('timeupdate', printTime);
+
+
+
+
+
+ /* another solution for making the playing/pause button with JQuery 
+
+
+ $('.btn-play').on('click', function(event){
+            event.preventDefault();
+            $('.btn-play').removeClass('disabled');
+            if($('.btn-play').hasClass('playing')){
+                $('.js-player').trigger('pause');
+            }else{
+                $('.js-player').trigger('play');
+            }
+            $('.btn-play').toggleClass('playing');
+        });
+
+
+
+
+
+// when using JQuery, use id instead of class to avoid problems as it $(class) returns an array but $(id) only returns an item. 
+
+
+	</script>
+</body>
+</html>
+
