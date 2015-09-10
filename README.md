@@ -1,4 +1,4 @@
-# Exercise - Spotify Player (JS, JQuery, Bootstap's modal) 
+# Ironhack exercise - Spotify Player (JS, JQuery, Bootstap's modal) 
 
 Iteration #1: Song search
 
